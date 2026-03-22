@@ -98,8 +98,7 @@ def inject_current_year():
 
 @app.route('/')
 def index():
-   
-    return render_template('index.html',  title="Home")
+    return "Server is working 🚀"
 
 
 
