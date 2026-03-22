@@ -14,4 +14,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-CMD ["sh", "-c", "gunicorn -w 1 app:app --bind 0.0.0.0:$PORT --timeout 120"]
+# Changed to gthread worker class and added thread count
+# --worker-class gthread: Better compatibility with C-extensions like OpenCV
+# --threads 4: Allows the single worker to handle multiple concurrent requests
+CMD ["sh", "-c", "gunicorn --worker-class gthread --threads 4 -w 1 app:app --bind 0.0.0.0:$PORT --timeout 120"]
