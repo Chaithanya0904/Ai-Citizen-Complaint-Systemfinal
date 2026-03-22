@@ -99,7 +99,10 @@ def inject_current_year():
 @app.route('/')
 def index():
     return "Server is working 🚀"
-
+    
+@app.route('/')
+def home():
+    return "App is running"
 
 
 @app.route('/register', methods=['GET', 'POST'])
