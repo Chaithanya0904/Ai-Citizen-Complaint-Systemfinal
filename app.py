@@ -616,8 +616,5 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-if __name__ == '__main__':
-    init_db()
-    import os
-    port = int(os.environ.get("PORT", 8080))
-    socketio.run(app, host="0.0.0.0", port=port)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
