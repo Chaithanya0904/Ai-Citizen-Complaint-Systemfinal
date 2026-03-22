@@ -1,0 +1,13 @@
+flask
+flask-socketio
+eventlet
+gunicorn
+torch==2.2.2
+torchvision==0.17.2
+opencv-python-headless
+numpy
+pillow
+pyyaml
+requests
+tqdm
+psutil
