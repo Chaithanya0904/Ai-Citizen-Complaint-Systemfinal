@@ -11,4 +11,3 @@ pyyaml
 requests
 tqdm
 psutil
-
