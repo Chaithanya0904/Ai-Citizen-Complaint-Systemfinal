@@ -1,5 +1,10 @@
 FROM python:3.10-slim
 
+# Prevent Python from writing .pyc files and enable real-time logging
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
+
 # Install system dependencies for OpenCV/X11/GL
 RUN apt-get update && apt-get install -y \
     libxcb1 \
@@ -10,11 +15,16 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+# Install dependencies first to leverage Docker cache
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application
 COPY . .
 
-# Changed to gthread worker class and added thread count
-# --worker-class gthread: Better compatibility with C-extensions like OpenCV
-# --threads 4: Allows the single worker to handle multiple concurrent requests
-CMD ["sh", "-c", "gunicorn --worker-class gthread --threads 4 -w 1 app:app --bind 0.0.0.0:$PORT --timeout 120"]
+# Final Command: Using gthread to avoid the eventlet deprecation/errors
+# -w 1: One worker process (good for memory-heavy OpenCV apps)
+# --threads 4: Allows 4 concurrent requests within that worker
+CMD ["sh", "-c", "gunicorn --worker-class gthread --threads 4 --workers 1 --bind 0.0.0.0:$PORT --timeout 120 app:app"]
