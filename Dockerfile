@@ -15,13 +15,15 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Copy and install requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+# Copy application code
 COPY . .
 
-# IMPORTANT for SocketIO + Gunicorn + Gevent:
-# We use -k gevent to support WebSockets. 
-# We use --worker-connections 1000 to handle many concurrent SocketIO clients.
-CMD ["sh", "-c", "gunicorn -k gevent --worker-connections 1000 --workers 1 --bind 0.0.0.0:$PORT --timeout 120 app:app"]
+# EXPLICITLY set the worker class to gevent to avoid the eventlet crash
+# -k gevent: Required for flask-socketio support
+# --worker-connections: Increases how many websocket clients you can handle
+CMD ["sh", "-c", "gunicorn --worker-class gevent --workers 1 --worker-connections 1000 --bind 0.0.0.0:$PORT --timeout 120 app:app"]
